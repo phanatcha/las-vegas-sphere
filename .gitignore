@@ -1,3 +1,15 @@
+build/
+bin/
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.vscode/
+*.o
+*.obj
+*.exe
+*.app
+*.out
 CMakeLists.txt.user
 CMakeCache.txt
 CMakeFiles
