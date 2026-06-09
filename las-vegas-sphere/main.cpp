@@ -8,8 +8,10 @@
 
 #include <camera.h>
 
+#include <Sphere.h>
+#include <Cylinder.h>
+
 #include <iostream>
-#include "Sphere.h"
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -32,6 +34,7 @@ float lastFrame = 0.0f;
 
 // ~~~~~~~~>sphere<~~~~~~~~~~
 Sphere sphere(1.0f, 36, 18, true,  2);
+Cylinder cylinder(1.2f, 1.2f, 0.07f, 36, 1, true, 2);
 
 int main()
 {
@@ -62,7 +65,8 @@ int main()
 
     glEnable(GL_DEPTH_TEST);
     
-    Shader lightingShader("light_sphere.vs", "light_sphere.fs");
+    Shader lightingSphereShader("light_sphere.vs", "light_sphere.fs");
+    Shader lightingCylinderShader("light_base.vs", "light_base.fs");
 
     // ~~~~~~~~~~~~~~>sphere buffer setup<~~~~~~~~~~~~~~
     unsigned int sphereVAO, sphereVBO, sphereEBO;
@@ -83,6 +87,25 @@ int main()
 
     glBindVertexArray(0);
 
+    // ~~~~~~~~~~~~~~>cylinder buffer setup<~~~~~~~~~~~~~~
+    unsigned int cylinderVAO, cylinderVBO, cylinderEBO;
+    glGenVertexArrays(1, &cylinderVAO);
+    glGenBuffers(1, &cylinderVBO);
+    glGenBuffers(1, &cylinderEBO);
+
+    glBindVertexArray(cylinderVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, cylinderVBO);
+    glBufferData(GL_ARRAY_BUFFER, cylinder.getInterleavedVertexSize(), cylinder.getInterleavedVertices(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cylinderEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, cylinder.getIndexSize(), cylinder.getIndices(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, cylinder.getInterleavedStride(), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -94,25 +117,39 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // ~~~~~~~~~~>>>>SPHERE<<<<~~~~~~~~~~~~~~~~~~~~~~~~
         // ~~~~~~~~~~>view/projection transformations<~~~~~~~~~~
-        lightingShader.use();
+        lightingSphereShader.use();
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 sphereModel = glm::mat4(1.0f);
         
-        lightingShader.setMat4("projection", projection);
-        lightingShader.setMat4("view", view);
-        lightingShader.setMat4("model", model);
+        lightingSphereShader.setMat4("projection", projection);
+        lightingSphereShader.setMat4("view", view);
+        lightingSphereShader.setMat4("model", sphereModel);
 
         glBindVertexArray(sphereVAO);
         glDrawElements(GL_TRIANGLES, sphere.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
+
+        // ~~~~~~~~~~>>>>Cylinder<<<<~~~~~~~~~~~~~~~~~~~~~~~~
+        lightingCylinderShader.use();
+        
+        lightingCylinderShader.setMat4("projection", projection);
+        lightingCylinderShader.setMat4("view", view);
+
+        glm::mat4 cylinderModel = glm::mat4(1.0f);
+        cylinderModel = glm::translate(cylinderModel, glm::vec3(0.0f, -0.3f, 0.0f));
+        lightingCylinderShader.setMat4("model", cylinderModel);
+
+        glBindVertexArray(cylinderVAO);
+        glDrawElements(GL_TRIANGLES, cylinder.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
         
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    glDeleteVertexArrays(1, &sphereVAO);
-    glDeleteBuffers(1, &sphereVBO);
+    glDeleteVertexArrays(1, &cylinderVAO);
+    glDeleteBuffers(1, &cylinderVBO);
     glfwTerminate();
     return 0;
 }

@@ -30,6 +30,7 @@ include_directories(${CMAKE_SOURCE_DIR}/dependencies/include)
 add_executable(${PROJECT_NAME} 
     las-vegas-sphere/main.cpp       
     las-vegas-sphere/Sphere.cpp  
+    las-vegas-sphere/Cylinder.cpp
     glad.c           
     stb_image.cpp    
 )
