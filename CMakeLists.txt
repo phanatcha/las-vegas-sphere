@@ -28,7 +28,8 @@ include_directories(${CMAKE_SOURCE_DIR}/dependencies/include)
 
 
 add_executable(${PROJECT_NAME} 
-    las-vegas-sphere/main.cpp         
+    las-vegas-sphere/main.cpp       
+    las-vegas-sphere/Sphere.cpp  
     glad.c           
     stb_image.cpp    
 )
@@ -40,3 +41,19 @@ target_link_libraries(${PROJECT_NAME}
     ${CoreVideo_LIBRARY}
     ${GLFW3_LIBRARY}
 )
+
+file(GLOB SHADERS 
+    "${CMAKE_SOURCE_DIR}/*.vs" 
+    "${CMAKE_SOURCE_DIR}/*.fs"
+    "${CMAKE_SOURCE_DIR}/las-vegas-sphere/*.vs" 
+    "${CMAKE_SOURCE_DIR}/las-vegas-sphere/*.fs"
+)
+
+foreach(SHADER ${SHADERS})
+    add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        "${SHADER}"
+        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    )
+endforeach()
