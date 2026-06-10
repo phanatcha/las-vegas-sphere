@@ -46,10 +46,8 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 file(GLOB SHADERS 
-    "${CMAKE_SOURCE_DIR}/*.vs" 
-    "${CMAKE_SOURCE_DIR}/*.fs"
-    "${CMAKE_SOURCE_DIR}/las-vegas-sphere/*.vs" 
-    "${CMAKE_SOURCE_DIR}/las-vegas-sphere/*.fs"
+    "${CMAKE_SOURCE_DIR}/resources/shaders/*.vs" 
+    "${CMAKE_SOURCE_DIR}/resources/shaders/*.fs"
 )
 
 foreach(SHADER ${SHADERS})
