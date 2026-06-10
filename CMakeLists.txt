@@ -31,6 +31,8 @@ add_executable(${PROJECT_NAME}
     las-vegas-sphere/main.cpp       
     las-vegas-sphere/Sphere.cpp  
     las-vegas-sphere/Cylinder.cpp
+    las-vegas-sphere/Input.cpp
+    las-vegas-sphere/Starfield.cpp
     glad.c           
     stb_image.cpp    
 )
