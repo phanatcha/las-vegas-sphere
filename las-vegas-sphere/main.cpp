@@ -15,13 +15,6 @@
 #include <iostream>
 #include <vector>
 
-// ~~~~~~~~~~~>camera<~~~~~~~~~~~~
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
-
-// ~~~~~~~~~~~>timing<~~~~~~~~~~~~
-float lastFrame = 0.0f;
-float deltaTime = 0.0f;
-
 // ~~~~~~~~>sphere<~~~~~~~~~~
 Sphere sphere(1.0f, 36, 18, true,  2);
 Cylinder cylinder(1.2f, 1.2f, 0.07f, 36, 1, true, 2);
@@ -133,6 +126,10 @@ int main()
         // ~~~~~~~~~~>>>>SPHERE<<<<~~~~~~~~~~~~~~~~~~~~~~~~
         // ~~~~~~~~~~>view/projection transformations<~~~~~~~~~~
         lightingSphereShader.use();
+
+        // beam time and the active pattern to the gpu
+        lightingSphereShader.setFloat("time", currentFrame);
+        lightingSphereShader.setInt("patternType", currentPattern);
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)Config::SCR_WIDTH / (float)Config::SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();

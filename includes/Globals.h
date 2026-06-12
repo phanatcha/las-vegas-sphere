@@ -8,6 +8,9 @@ namespace Config {
 }
 
 // ~~~~~~~~~~~>shared variable<~~~~~~~~~~~~
-extern Camera camera;
-extern float deltaTime;
-
+// camera
+inline Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+// timing
+inline float lastFrame = 0.0f;
+inline float deltaTime = 0.0f;
+inline int currentPattern = 1;
