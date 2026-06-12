@@ -49,21 +49,22 @@ void processInput(GLFWwindow *window)
             if (currentPattern > 5) 
                 currentPattern = 1;
             rightKeyPressed = true;
-        } else {
-            rightKeyPressed = false;
         }
+    } else {
+        rightKeyPressed = false;
     }
+
     // left arrow = previous pattern
     static bool leftKeyPressed = false;
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
         if (!leftKeyPressed) {
             currentPattern--;
-            if (currentPattern > 5) 
-                currentPattern = 1;
+            if (currentPattern < 1)
+                currentPattern = 5;
             leftKeyPressed = true;
-        } else {
-            leftKeyPressed = false;
         }
+    } else {
+        leftKeyPressed = false;
     }
 }
 
