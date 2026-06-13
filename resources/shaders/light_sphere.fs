@@ -2,9 +2,10 @@
 out vec4 FragColor;
 
 in vec3 localPos;
-uniform float time;
 
+uniform float time;
 uniform int patternType;
+uniform float brightness;
 
 void main()
 {
@@ -68,5 +69,5 @@ void main()
             color = vec3(1.0);
     }
 
-    FragColor = vec4(color, 1.0);
+    FragColor = vec4(color * brightness, 1.0);
 }

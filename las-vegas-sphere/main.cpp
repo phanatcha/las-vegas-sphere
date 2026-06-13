@@ -127,9 +127,12 @@ int main()
         // ~~~~~~~~~~>view/projection transformations<~~~~~~~~~~
         lightingSphereShader.use();
 
+        float currentLightLevel = isScreenOn ? globalBrightness : 0.0f;
+
         // beam time and the active pattern to the gpu
         lightingSphereShader.setFloat("time", currentFrame);
         lightingSphereShader.setInt("patternType", currentPattern);
+        lightingSphereShader.setFloat("brightness", currentLightLevel);
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)Config::SCR_WIDTH / (float)Config::SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();

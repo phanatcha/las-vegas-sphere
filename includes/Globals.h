@@ -14,3 +14,6 @@ inline Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 inline float lastFrame = 0.0f;
 inline float deltaTime = 0.0f;
 inline int currentPattern = 1;
+//brightness
+inline bool isScreenOn = true;
+inline float globalBrightness = 1.0f;

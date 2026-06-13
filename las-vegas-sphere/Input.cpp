@@ -66,6 +66,30 @@ void processInput(GLFWwindow *window)
     } else {
         leftKeyPressed = false;
     }
+
+    // brightness controls
+    float fadeSpeed = 1.5f;
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        globalBrightness += fadeSpeed * deltaTime;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        globalBrightness -= fadeSpeed * deltaTime;
+        if (globalBrightness < 0.0f) globalBrightness = 0.0f;
+    }
+
+    // >>>letters<<<
+    // toggle sphere on/off
+    static bool xKeyPressed = false;
+    if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+    {
+        if (!xKeyPressed)
+        {
+            isScreenOn = !isScreenOn;
+            xKeyPressed = true;
+        }
+    } else {
+        xKeyPressed = false;
+    }
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height)
