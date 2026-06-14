@@ -1,9 +1,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <Globals.h>
+#include "Globals.h"
 #include "Input.h"
-#include <camera.h>
+#include "camera.h"
 
 #include <iostream>
 

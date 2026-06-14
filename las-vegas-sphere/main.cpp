@@ -1,23 +1,27 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <shader_m.h>
+#include "shader_m.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <Globals.h>
-#include <Input.h>
-#include <Sphere.h>
-#include <Cylinder.h>
-#include <Starfield.h>
+#include "Globals.h"
+#include "Input.h"
+#include "Sphere.h"
+#include "Cylinder.h"
+#include "Starfield.h"
+#include "Moonlight.h"
 
+#include "stb_image.h"
+#include "filesystem.h"
 #include <iostream>
 #include <vector>
 
-// ~~~~~~~~>sphere<~~~~~~~~~~
-Sphere sphere(1.0f, 36, 18, true,  2);
-Cylinder cylinder(1.2f, 1.2f, 0.07f, 36, 1, true, 2);
+// ~~~~~~~~>vegasSphere<~~~~~~~~~~
+Sphere vegasSphere(1.0f, 36, 18, true,  2);
+Sphere moonSphere(0.2f, 36, 18, true, 2);
+Cylinder baseCylinder(1.2f, 1.2f, 0.07f, 36, 1, true, 2);
 
 int main()
 {
@@ -51,42 +55,49 @@ int main()
     Shader lightingSphereShader("light_sphere.vs", "light_sphere.fs");
     Shader lightingCylinderShader("light_base.vs", "light_base.fs");
     Shader lightingStarShader("star.vs", "star.fs");
+    Shader lightMoonShader("moon.vs", "moon.fs");
 
-    // ~~~~~~~~~~~~~~>sphere buffer setup<~~~~~~~~~~~~~~
-    unsigned int sphereVAO, sphereVBO, sphereEBO;
-    glGenVertexArrays(1, &sphereVAO);
-    glGenBuffers(1, &sphereVBO);
-    glGenBuffers(1, &sphereEBO);
+    // ~~~~~~~~~~~~~~>vegasSphere buffer setup<~~~~~~~~~~~~~~
+    unsigned int vegasSphereVAO, vegasSphereVBO, vegasSphereEBO;
+    glGenVertexArrays(1, &vegasSphereVAO);
+    glGenBuffers(1, &vegasSphereVBO);
+    glGenBuffers(1, &vegasSphereEBO);
 
-    glBindVertexArray(sphereVAO);
+    glBindVertexArray(vegasSphereVAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, sphereVBO);
-    glBufferData(GL_ARRAY_BUFFER, sphere.getInterleavedVertexSize(), sphere.getInterleavedVertices(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, vegasSphereVBO);
+    glBufferData(GL_ARRAY_BUFFER, vegasSphere.getInterleavedVertexSize(), vegasSphere.getInterleavedVertices(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sphereEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sphere.getIndexSize(), sphere.getIndices(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vegasSphereEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, vegasSphere.getIndexSize(), vegasSphere.getIndices(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sphere.getInterleavedStride(), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vegasSphere.getInterleavedStride(), (void*)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vegasSphere.getInterleavedStride(), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 
-    // ~~~~~~~~~~~~~~>cylinder buffer setup<~~~~~~~~~~~~~~
-    unsigned int cylinderVAO, cylinderVBO, cylinderEBO;
-    glGenVertexArrays(1, &cylinderVAO);
-    glGenBuffers(1, &cylinderVBO);
-    glGenBuffers(1, &cylinderEBO);
+    // ~~~~~~~~~~~~~~>baseCylinder buffer setup<~~~~~~~~~~~~~~
+    unsigned int baseCylinderVAO, baseCylinderVBO, baseCylinderEBO;
+    glGenVertexArrays(1, &baseCylinderVAO);
+    glGenBuffers(1, &baseCylinderVBO);
+    glGenBuffers(1, &baseCylinderEBO);
 
-    glBindVertexArray(cylinderVAO);
+    glBindVertexArray(baseCylinderVAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, cylinderVBO);
-    glBufferData(GL_ARRAY_BUFFER, cylinder.getInterleavedVertexSize(), cylinder.getInterleavedVertices(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, baseCylinderVBO);
+    glBufferData(GL_ARRAY_BUFFER, baseCylinder.getInterleavedVertexSize(), baseCylinder.getInterleavedVertices(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cylinderEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, cylinder.getIndexSize(), cylinder.getIndices(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, baseCylinderEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, baseCylinder.getIndexSize(), baseCylinder.getIndices(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, cylinder.getInterleavedStride(), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, baseCylinder.getInterleavedStride(), (void*)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, baseCylinder.getInterleavedStride(), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
 
@@ -112,6 +123,53 @@ int main()
 
     glBindVertexArray(0);
 
+    // ~~~~~~~~~~~~~~~> moonSphere buffer setup <~~~~~~~~~~~~~~~~~
+    unsigned int moonSphereVAO, moonSphereVBO, moonSphereEBO;
+    glGenVertexArrays(1, &moonSphereVAO);
+    glGenBuffers(1, &moonSphereVBO);
+    glGenBuffers(1, &moonSphereEBO);
+
+    glBindVertexArray(moonSphereVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, moonSphereVBO);
+    glBufferData(GL_ARRAY_BUFFER, moonSphere.getInterleavedVertexSize(), moonSphere.getInterleavedVertices(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, moonSphereEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, moonSphere.getIndexSize(), moonSphere.getIndices(), GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, moonSphere.getInterleavedStride(), (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, moonSphere.getInterleavedStride(), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    glBindVertexArray(0);
+
+    unsigned int moonTexture;
+    //~~~~~~~~~>moonTexture<~~~~~~~~~~~~~
+    glGenTextures(1, &moonTexture);
+    glBindTexture(GL_TEXTURE_2D, moonTexture); 
+    // set the texture wrapping/filtering options
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // load and generate the texture
+    int width, height, nrChannels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char *data = stbi_load(FileSystem::getPath("resources/textures/moon1024.bmp").c_str(), &width, &height, &nrChannels, 0);
+
+    if (data) 
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -123,9 +181,21 @@ int main()
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // activate and bind texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, moonTexture);
+
         // ~~~~~~~~~~>>>>SPHERE<<<<~~~~~~~~~~~~~~~~~~~~~~~~
         // ~~~~~~~~~~>view/projection transformations<~~~~~~~~~~
         lightingSphereShader.use();
+        sendMoonlightToShader(lightingSphereShader);
+        // >>>black plastic material<<<
+        lightingSphereShader.setVec3("material.ambient", 0.0f, 0.0f, 0.0f);
+        lightingSphereShader.setVec3("material.diffuse", 0.02f, 0.02f, 0.02f);
+        lightingSphereShader.setVec3("material.specular", 0.6f, 0.6f, 0.6f);
+        lightingSphereShader.setFloat("material.shininess", 32.0f);
+
+        lightingSphereShader.setVec3("viewPos", camera.Position);
 
         float currentLightLevel = isScreenOn ? globalBrightness : 0.0f;
 
@@ -136,27 +206,36 @@ int main()
 
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)Config::SCR_WIDTH / (float)Config::SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 sphereModel = glm::mat4(1.0f);
+        glm::mat4 vegasSphereModel = glm::mat4(1.0f);
         
         lightingSphereShader.setMat4("projection", projection);
         lightingSphereShader.setMat4("view", view);
-        lightingSphereShader.setMat4("model", sphereModel);
+        lightingSphereShader.setMat4("model", vegasSphereModel);
 
-        glBindVertexArray(sphereVAO);
-        glDrawElements(GL_TRIANGLES, sphere.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
+        glBindVertexArray(vegasSphereVAO);
+        glDrawElements(GL_TRIANGLES, vegasSphere.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
 
         // ~~~~~~~~~~>>>>Cylinder<<<<~~~~~~~~~~~~~~~~~~~~~~~~
         lightingCylinderShader.use();
+        sendMoonlightToShader(lightingCylinderShader);
+
+        // >>>reinforced concrete material<<<
+        lightingCylinderShader.setVec3("material.ambient", 0.1f, 0.1f, 0.1f);
+        lightingCylinderShader.setVec3("material.diffuse", 0.5f, 0.5f, 0.5f);
+        lightingCylinderShader.setVec3("material.specular", 0.05f, 0.05f, 0.05f);
+        lightingCylinderShader.setFloat("material.shininess", 2.0f);        
+
+        lightingCylinderShader.setVec3("viewPos", camera.Position);
         
         lightingCylinderShader.setMat4("projection", projection);
         lightingCylinderShader.setMat4("view", view);
 
-        glm::mat4 cylinderModel = glm::mat4(1.0f);
-        cylinderModel = glm::translate(cylinderModel, glm::vec3(0.0f, -0.3f, 0.0f));
-        lightingCylinderShader.setMat4("model", cylinderModel);
+        glm::mat4 baseCylinderModel = glm::mat4(1.0f);
+        baseCylinderModel = glm::translate(baseCylinderModel, glm::vec3(0.0f, -0.3f, 0.0f));
+        lightingCylinderShader.setMat4("model", baseCylinderModel);
 
-        glBindVertexArray(cylinderVAO);
-        glDrawElements(GL_TRIANGLES, cylinder.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
+        glBindVertexArray(baseCylinderVAO);
+        glDrawElements(GL_TRIANGLES, baseCylinder.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
 
         // ~~~~~~~~~~>>>>Star<<<<~~~~~~~~~~~~~~~~~~~~~~~~
         glEnable(GL_PROGRAM_POINT_SIZE);
@@ -172,12 +251,25 @@ int main()
 
         glDisable(GL_BLEND);
 
+        // ~~~~~~~~~~>>>>Moon<<<<~~~~~~~~~~~~~~~~~~~~~~~~
+        lightMoonShader.use();
+        
+        lightMoonShader.setMat4("projection", projection);
+        lightMoonShader.setMat4("view", view);
+
+        glm::mat4 moonModel = glm::mat4(1.0f);
+        moonModel = glm::translate(moonModel, glm::vec3(-2.0f, 3.0f, -3.0f));
+        lightMoonShader.setMat4("model", moonModel);
+
+        glBindVertexArray(moonSphereVAO);
+        glDrawElements(GL_TRIANGLES, moonSphere.getIndexCount(), GL_UNSIGNED_INT, (void*)0);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
         
     }
-    glDeleteVertexArrays(1, &cylinderVAO);
-    glDeleteBuffers(1, &cylinderVBO);
+    glDeleteVertexArrays(1, &baseCylinderVAO);
+    glDeleteBuffers(1, &baseCylinderVBO);
     glfwTerminate();
     return 0;
 }
