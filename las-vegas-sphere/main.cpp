@@ -12,6 +12,8 @@
 #include "Cylinder.h"
 #include "Starfield.h"
 #include "Moonlight.h"
+#include "Openalclass.h"
+#include "Soundclass.h"
 
 #include "stb_image.h"
 #include "filesystem.h"
@@ -43,7 +45,6 @@ int main()
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     glfwSetCursorPosCallback(window, mouse_callback);
     glfwSetScrollCallback(window, scroll_callback);
-
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -172,6 +173,23 @@ int main()
     }
     stbi_image_free(data);
 
+    //~~~~~~~~~>audioSetup<~~~~~~~~~~~~~
+    OpenALClass audioManager;
+    if (!audioManager.Initialize())
+    {
+        std::cout << "Failed to initialize OpenAL hardware!\n";
+    }
+
+    SoundClass backgroundMusic;
+    if (!backgroundMusic.LoadTrack(FileSystem::getPath("resources/audios/Pedal.mp3"), 1.0f))
+    {
+        std::cout << "Failed to load MP3 file!\n";
+    }
+    else
+    {
+        backgroundMusic.PlayTrack(true);
+    }
+
     while (!glfwWindowShouldClose(window))
     {
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -272,6 +290,11 @@ int main()
     }
     glDeleteVertexArrays(1, &baseCylinderVAO);
     glDeleteBuffers(1, &baseCylinderVBO);
+
+    backgroundMusic.StopTrack();
+    backgroundMusic.ReleaseTrack();
+    audioManager.Shutdown();
+
     glfwTerminate();
     return 0;
 }

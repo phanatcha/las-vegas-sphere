@@ -6,6 +6,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+include_directories(/opt/homebrew/opt/openal-soft/include)
+link_directories(/opt/homebrew/opt/openal-soft/lib)
+
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
 endif()
@@ -16,6 +19,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/modules/")
 find_package(OpenGL REQUIRED)
 find_package(GLM REQUIRED)
 find_package(GLFW3 REQUIRED)
+find_package(OpenAL REQUIRED)
 
 configure_file(
     "${CMAKE_SOURCE_DIR}/configuration/root_directory.h.in"
@@ -34,11 +38,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/includes
     ${CMAKE_SOURCE_DIR}/dependencies/include
     ${CMAKE_CURRENT_BINARY_DIR}
+    ${OPENAL_INCLUDE_DIR}
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     OpenGL::GL
     ${GLFW3_LIBRARY}
+    ${OPENAL_LIBRARY}
+    OpenAL
     "-framework Cocoa"
     "-framework IOKit"
     "-framework CoreVideo"
