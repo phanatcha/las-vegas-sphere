@@ -4,6 +4,7 @@
 #include <string>
 
 
+
 bool SoundClass::LoadMP3File(std::string_view filename, int& outChannels, int& outSampleRate)
 {
     drmp3_config config;
@@ -47,7 +48,6 @@ bool SoundClass::LoadTrack(std::string_view filename, float volume)
 
     // ~~~~~~~~~>MP3 = Mono or Stereo?<~~~~~~~~~~~~~
     ALenum format = (channels == 2) ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16;
-
 
     // ~~~~~~~~~>Upload vector data<~~~~~~~~~~~~~
     alBufferData(m_audioBufferId, format, m_audioData.data(), m_audioData.size() * sizeof(short), sampleRate);
@@ -93,4 +93,16 @@ bool SoundClass::StopTrack()
     alGetError();
     alSourceStop(m_audioSourceId);
     return (alGetError() == AL_NO_ERROR);
+}
+
+void SoundClass::SetPosition(float x, float y, float z)
+{
+    alGetError();
+    alSource3f(m_audioSourceId, AL_POSITION, x, y, z);
+}
+
+void SoundClass::SetAttenuation(float referenceDistance, float rolloffFactor)
+{
+    alSourcef(m_audioSourceId, AL_REFERENCE_DISTANCE, referenceDistance);
+    alSourcef(m_audioSourceId, AL_ROLLOFF_FACTOR, rolloffFactor);
 }

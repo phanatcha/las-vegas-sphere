@@ -181,14 +181,18 @@ int main()
     }
 
     SoundClass backgroundMusic;
-    if (!backgroundMusic.LoadTrack(FileSystem::getPath("resources/audios/Pedal.mp3"), 1.0f))
+    if (!backgroundMusic.LoadTrack(FileSystem::getPath("resources/audios/Pedal-mono.mp3"), 1.0f))
     {
         std::cout << "Failed to load MP3 file!\n";
     }
     else
     {
+        backgroundMusic.SetPosition(0.0f, 0.0f , 0.0f);
+        backgroundMusic.SetAttenuation(1.0f, 1.0f);
         backgroundMusic.PlayTrack(true);
     }
+
+
 
     while (!glfwWindowShouldClose(window))
     {
@@ -197,6 +201,13 @@ int main()
         lastFrame = currentFrame;
 
         processInput(window);
+
+        audioManager.UpdateListener(
+            camera.Position.x, camera.Position.y, camera.Position.z,
+            camera.Front.x, camera.Front.y, camera.Front.z,
+            camera.Up.x, camera.Up.y, camera.Up.z
+        );
+        
         
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

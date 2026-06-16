@@ -29,6 +29,8 @@ bool OpenALClass::Initialize()
         alcCloseDevice(device);
         return false;
     }
+
+    alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
     return true;
 }
 
@@ -49,3 +51,13 @@ void OpenALClass::Shutdown()
         }
     }
 }
+
+void OpenALClass::UpdateListener(float posX, float posY, float posZ,
+                                                                                            float forwardX, float forwardY, float forwardZ,
+                                                                                            float upX, float upY, float upZ)
+{
+    alListener3f(AL_POSITION, posX, posY, posZ);
+    const float orientation[6] = { forwardX, forwardY, forwardZ, upX, upY, upZ };
+    alListenerfv(AL_ORIENTATION, orientation);
+}
+                                                                                        

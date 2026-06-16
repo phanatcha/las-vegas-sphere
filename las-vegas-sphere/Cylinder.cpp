@@ -799,13 +799,6 @@ std::vector<float> Cylinder::getSideNormals()
         normals.push_back(cos(sectorAngle)*x0 - sin(sectorAngle)*y0);   // nx
         normals.push_back(sin(sectorAngle)*x0 + cos(sectorAngle)*y0);   // ny
         normals.push_back(z0);  // nz
-        /*
-        //debug
-        float nx = cos(sectorAngle)*x0 - sin(sectorAngle)*y0;
-        float ny = sin(sectorAngle)*x0 + cos(sectorAngle)*y0;
-        std::cout << "normal=(" << nx << ", " << ny << ", " << z0
-                  << "), length=" << sqrtf(nx*nx + ny*ny + z0*z0) << std::endl;
-        */
     }
 
     return normals;

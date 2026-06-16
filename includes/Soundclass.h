@@ -19,6 +19,8 @@ class SoundClass
         void ReleaseTrack();
         bool PlayTrack(bool loop);
         bool StopTrack();
+        void SetPosition(float x, float y, float z);
+        void SetAttenuation(float referenceDistance, float rolloffFactor);
 
     private:
         [[nodiscard]] bool LoadMP3File(std::string_view filename, int& outChannels, int& outSampleRate);

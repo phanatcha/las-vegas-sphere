@@ -17,7 +17,10 @@ class OpenALClass
         [[nodiscard]] bool Initialize();
 
         void Shutdown();
-
+        void UpdateListener(float posX, float posY, float posZ,
+                                                            float forwardX, float forwardY, float forwardZ,
+                                                            float upX, float upY, float upZ);
+                                                            
     private:
 
 };
