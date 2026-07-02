@@ -26,7 +26,7 @@ configure_file(
 )
 
 file(GLOB SOURCES CONFIGURE_DEPENDS
-    "las-vegas-sphere/*.cpp"
+    "src/*.cpp"
     "*.cpp" 
     "*.c"   
 )
@@ -52,8 +52,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 file(GLOB SHADERS 
     "${CMAKE_SOURCE_DIR}/*.vs" 
     "${CMAKE_SOURCE_DIR}/*.fs"
-    "${CMAKE_SOURCE_DIR}/las-vegas-sphere/*.vs" 
-    "${CMAKE_SOURCE_DIR}/las-vegas-sphere/*.fs"
+    "${CMAKE_SOURCE_DIR}/src/*.vs" 
+    "${CMAKE_SOURCE_DIR}/src/*.fs"
     "${CMAKE_SOURCE_DIR}/resources/shaders/*.vs"
     "${CMAKE_SOURCE_DIR}/resources/shaders/*.fs"
 )
